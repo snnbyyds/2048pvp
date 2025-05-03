@@ -1,4 +1,4 @@
-#include "board.h"
+#include <board.h>
 
 int board[N][N];
 
@@ -7,25 +7,6 @@ static bool randseed_init = false;
 static inline void initseed() {
     srand((unsigned int)time(NULL));
     randseed_init = true;
-}
-
-// Print the board to the console
-void print_board() {
-    system("clear"); // TODO: Make this compatible in more OS
-    putchar('\n');
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            int v = board[i][j];
-            if (v == 0)
-                printf(" . ");
-            else if (v > 0)
-                printf("W%d ", v);
-            else
-                printf("B%d ", -v);;
-        }
-        putchar('\n');
-    }
-    putchar('\n');
 }
 
 // Spawn randomly
@@ -147,5 +128,4 @@ void init_board() {
         spawn(1);
         spawn(-1);
     }
-    print_board();
 }

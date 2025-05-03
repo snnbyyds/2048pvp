@@ -15,8 +15,6 @@ bool move_down();
 
 void spawn(int sign);
 
-void print_board();
-
 extern int board[N][N];
 
 #endif

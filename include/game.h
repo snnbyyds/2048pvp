@@ -3,6 +3,8 @@
 
 #include "common.h"
 
-void rungame();
+int rungame();
+
+extern int turn;
 
 #endif
