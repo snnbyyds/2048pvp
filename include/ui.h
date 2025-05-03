@@ -37,5 +37,6 @@ void ui_render();
 ui_code_t ui_handle_event();
 void ui_delay(uint32_t ms);
 void ui_cleanup();
+void ui_prompt(const char *s, uint32_t delay_ms, const SDL_Color *fontcolor);
 
 #endif

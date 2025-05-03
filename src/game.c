@@ -18,24 +18,28 @@
 #include <game.h>
 #include <ui.h>
 
-int turn = 0;
+static inline player_t check_owner(int block) {
+    if (block > 0)
+        return PLAYER_A;
+    if (block < 0)
+        return PLAYER_B;
+    return PLAYER_NONE;
+}
 
-static int check_2048() {
+static player_t check_2048() {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             int v = board[i][j];
-            if (v == 2048)
-                return 1;
-            if (v == -2048)
-                return -1;
+            if (abs(v) == 2048)
+                return check_owner(v);
         }
     }
-    return 0;
+    return PLAYER_NONE;
 }
 
-static int check_with_largest_block() {
+static player_t check_with_largest_block() {
     int mx = INT_MIN;
-    int ret = 0;
+    player_t ret = PLAYER_NONE;
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             int v = board[i][j];
@@ -43,11 +47,32 @@ static int check_with_largest_block() {
                 continue;
             if (abs(v) > mx) {
                 mx = v;
-                ret = v > 0 ? 1 : -1;
+                ret = check_owner(v);
             }
         }
     }
     return ret;
+}
+
+static void display_result(player_t winner) {
+    assert(winner != PLAYER_NONE);
+    const SDL_Color color = {13, 116, 216, 255};
+    if (winner == PLAYER_A)
+        ui_prompt("PLAYER A WINS!!", 4096, &color);
+    else
+        ui_prompt("PLAYER B WINS!!", 4096, &color);
+}
+
+static void display_player(int turn) {
+    if (turn == 0)
+        ui_prompt("PLAYER A's turn", 512, NULL);
+    else
+        ui_prompt("PLAYER B's turn", 512, NULL);
+}
+
+static void welcome() {
+    const SDL_Color color = {4, 241, 181, 255};
+    ui_prompt("Welcome to 2048pvp", 2048, &color);
 }
 
 int rungame() {
@@ -55,12 +80,18 @@ int rungame() {
         fprintf(stderr, "UI Init Failed! Quitting...\n");
         return EXIT_FAILURE;
     }
-    int status = 0;
+    player_t winner = PLAYER_NONE;
     ui_render();
+    welcome();
+    int turn = 0;
+    display_player(turn);
     while (true) {
         ui_code_t cmd = ui_handle_event();
-        if (cmd == UI_QUIT)
-            break;
+        if (cmd == UI_QUIT) {
+            ui_prompt("Exiting...", 512, NULL);
+            ui_cleanup();
+            return EXIT_SUCCESS;
+        }
         bool moved = false;
         switch (cmd) {
             case UI_UP: moved = move_up(); break;
@@ -71,17 +102,20 @@ int rungame() {
         }
         if (!moved)
             continue;
-        spawn(turn == 0 ? 1 : -1);
+        spawn(turn == 0 ? PLAYER_A : PLAYER_B);
         ui_render();
-        status = check_2048();
-        if (status)
+        winner = check_2048();
+        if (winner != PLAYER_NONE)
             break;
         if (!movable())
-            status = check_with_largest_block();
-        if (status)
+            winner = check_with_largest_block();
+        if (winner)
             break;
         turn ^= 1;
+        display_player(turn);
     }
+    display_result(winner);
+    while (ui_handle_event() != UI_QUIT);
     ui_cleanup();
     return EXIT_SUCCESS;
 }

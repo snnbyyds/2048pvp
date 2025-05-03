@@ -19,8 +19,8 @@
 
 #include "common.h"
 
-int rungame();
+typedef enum {PLAYER_A = 1, PLAYER_B = -1, PLAYER_NONE = 0} player_t;
 
-extern int turn;
+int rungame();
 
 #endif

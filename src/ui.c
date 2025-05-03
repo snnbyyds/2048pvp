@@ -23,6 +23,7 @@ static const char *font = "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf";
 static SDL_Window *gWindow = NULL;
 static SDL_Renderer *gRenderer = NULL;
 static TTF_Font *gFont = NULL;
+static SDL_Color gFontColor = {0, 0, 0, 255};
 
 bool ui_init() {
     if (SDL_Init(SDL_INIT_VIDEO))
@@ -61,8 +62,7 @@ void ui_render() {
             if (v) {
                 char buf[18];
                 snprintf(buf, 16, "%d", abs(v));
-                SDL_Color color = {0, 0, 0, 255};
-                SDL_Surface *surf = TTF_RenderText_Solid(gFont, buf, color);
+                SDL_Surface *surf = TTF_RenderText_Solid(gFont, buf, gFontColor);
                 SDL_Texture *tx = SDL_CreateTextureFromSurface(gRenderer, surf);
                 int w, h;
                 SDL_QueryTexture(tx, NULL, NULL, &w, &h);
@@ -78,6 +78,22 @@ void ui_render() {
         }
     }
     SDL_RenderPresent(gRenderer);
+}
+
+void ui_prompt(const char *s, uint32_t delay_ms, const SDL_Color *fontcolor) {
+    assert(s);
+    ui_render();
+    SDL_Surface *surf = TTF_RenderText_Solid(gFont, s, fontcolor ? *fontcolor : gFontColor);
+    SDL_Texture *tx = SDL_CreateTextureFromSurface(gRenderer, surf);
+    int w, h;
+    SDL_QueryTexture(tx, NULL, NULL, &w, &h);
+    SDL_Rect dst = { (WINDOW_SIZE - w) >> 1, (WINDOW_SIZE - h) >> 1, w, h };
+    SDL_RenderCopy(gRenderer, tx, NULL, &dst);
+    SDL_RenderPresent(gRenderer);
+    ui_delay(delay_ms);
+    SDL_DestroyTexture(tx);
+    SDL_FreeSurface(surf);
+    ui_render();
 }
 
 ui_code_t ui_handle_event() {
