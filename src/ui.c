@@ -22,13 +22,17 @@ static const char *font = "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf";
 
 static SDL_Window *gWindow = NULL;
 static SDL_Renderer *gRenderer = NULL;
+static Mix_Music *gMusic = NULL;
 static TTF_Font *gFont = NULL;
 static SDL_Color gFontColor = {0, 0, 0, 255};
 
 bool ui_init() {
-    if (SDL_Init(SDL_INIT_VIDEO))
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO))
         return false;
-    if (TTF_Init())
+    if (TTF_Init() || Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048))
+        return false;
+    gMusic = Mix_LoadMUS("assets/beast.mp3");
+    if (!gMusic)
         return false;
     gWindow = SDL_CreateWindow(
         "2048 PvP", 
@@ -80,6 +84,10 @@ void ui_render() {
     SDL_RenderPresent(gRenderer);
 }
 
+void ui_play_sound() {
+    Mix_PlayMusic(gMusic, 1);
+}
+
 void ui_prompt(const char *s, uint32_t delay_ms, const SDL_Color *fontcolor) {
     assert(s);
     ui_render();
@@ -119,12 +127,15 @@ void ui_delay(uint32_t ms) {
 }
 
 void ui_cleanup() {
+    if (gMusic)
+        Mix_FreeMusic(gMusic);
     if (gFont)
         TTF_CloseFont(gFont);
     if (gRenderer)
         SDL_DestroyRenderer(gRenderer);
     if (gWindow)
         SDL_DestroyWindow(gWindow);
+    Mix_CloseAudio();
     TTF_Quit();
     SDL_Quit();
 }

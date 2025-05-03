@@ -18,6 +18,7 @@
 #define _UI_H_
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_ttf.h>
 #include "common.h"
 
@@ -38,5 +39,6 @@ ui_code_t ui_handle_event();
 void ui_delay(uint32_t ms);
 void ui_cleanup();
 void ui_prompt(const char *s, uint32_t delay_ms, const SDL_Color *fontcolor);
+void ui_play_sound();
 
 #endif

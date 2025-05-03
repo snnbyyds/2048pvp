@@ -102,6 +102,7 @@ int rungame() {
         }
         if (!moved)
             continue;
+        ui_play_sound();
         spawn(turn == 0 ? PLAYER_A : PLAYER_B);
         ui_render();
         winner = check_2048();

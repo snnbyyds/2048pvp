@@ -1,6 +1,6 @@
 CC ?= clang
 CFLAGS ?= -O3 -Wall -Werror $(shell sdl2-config --cflags)
-LDFLAGS ?= -flto $(shell sdl2-config --libs) -lSDL2_ttf
+LDFLAGS ?= -flto $(shell sdl2-config --libs) -lSDL2_ttf -lSDL2_mixer
 
 SRC_DIR := src
 OBJ_DIR := obj
