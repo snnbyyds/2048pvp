@@ -21,13 +21,14 @@
 - **SDL2** (>=2.0.1)  
 - **SDL2_ttf**  
 - **SDL2_mixer**  
+- **SDL2_image**
 - **clang** or **gcc**
 
 ### Arch Linux
 
 ```bash
 # Install dependencies via pacman
-sudo pacman -Syu sdl2 sdl2_ttf sdl2_mixer clang make
+sudo pacman -Syu sdl2 sdl2_ttf sdl2_mixer sdl2_image clang make
 ```
 ### Debian / Ubuntu
 ```bash
@@ -46,6 +47,7 @@ pacman -S --needed \
     mingw-w64-x86_64-SDL2 \
     mingw-w64-x86_64-SDL2_ttf \
     mingw-w64-x86_64-SDL2_mixer \
+    mingw-w64-x86_64-SDL2_image \
     mingw-w64-x86_64-libsharpyuv \
     zip
 ```

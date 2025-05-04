@@ -17,11 +17,15 @@
 #include <ui.h>
 #include <board.h>
 
+static const char *background_music = "assets/background.mp3";
+static const char *sound_effect = "assets/move.wav";
+static const char *cursor = "assets/cursor.png";
 static const char *font = "assets/Morning Routine.otf";
 static const char *menu_text[MENU_ITEMS] = {"Start Game", "Demo", "Exit"};
 
 static SDL_Window *gWindow = NULL;
 static SDL_Renderer *gRenderer = NULL;
+static SDL_Cursor *gCursor = NULL;
 static Mix_Music *gMusic = NULL;
 static Mix_Chunk *gSoundEffect = NULL;
 static TTF_Font *gFont = NULL;
@@ -32,8 +36,8 @@ bool ui_init() {
         return false;
     if (TTF_Init() || Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048))
         return false;
-    gMusic = Mix_LoadMUS("assets/background.mp3");
-    gSoundEffect = Mix_LoadWAV("assets/move.wav");
+    gMusic = Mix_LoadMUS(background_music);
+    gSoundEffect = Mix_LoadWAV(sound_effect);
     if (!gMusic || !gSoundEffect)
         return false;
     Mix_VolumeMusic(MIX_MAX_VOLUME / 4);
@@ -49,6 +53,12 @@ bool ui_init() {
     gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
     if (!gRenderer)
         return false;
+    SDL_Surface *surf = IMG_Load(cursor);
+    if (!surf)
+        return false;
+    gCursor = SDL_CreateColorCursor(surf, 16, 16);
+    SDL_FreeSurface(surf);
+    SDL_SetCursor(gCursor);
     Mix_PlayMusic(gMusic, -1);
     return (gFont = TTF_OpenFont(font, 48));
 }
@@ -236,6 +246,8 @@ void ui_delay(uint32_t ms) {
 }
 
 void ui_cleanup() {
+    if (gCursor)
+        SDL_FreeCursor(gCursor);
     if (gMusic)
         Mix_FreeMusic(gMusic);
     if (gSoundEffect)

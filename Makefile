@@ -6,6 +6,7 @@ ifeq ($(OS),Windows_NT)
   # Link statically against SDL2, TTF, Mixer and system libs
   SDL_LINKER_FLAGS := `pkg-config --libs --static SDL2`
   SDL_LINKER_FLAGS += `pkg-config --libs --static SDL2_ttf`
+  SDL_LINKER_FLAGS += `pkg-config --libs --static SDL2_image`
   SDL_LINKER_FLAGS += `pkg-config --libs --static SDL2_Mixer`
   SDL_LINKER_FLAGS += -lbrotlicommon -lsharpyuv -lstdc++ -lgcc -lssp
   LDFLAGS  ?= -static \
@@ -19,7 +20,7 @@ else
   # Unix-like (Linux, macOS)
   CC       ?= clang
   CFLAGS   ?= -O3 -Wall -Werror $(shell sdl2-config --cflags)
-  LDFLAGS  ?= -flto $(shell sdl2-config --libs) -lSDL2_ttf -lSDL2_mixer
+  LDFLAGS  ?= -flto $(shell sdl2-config --libs) -lSDL2_ttf -lSDL2_mixer -lSDL2_image
   TARGET   := 2048pvp
 endif
 
