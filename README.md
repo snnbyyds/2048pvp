@@ -11,7 +11,8 @@
 - **Local PvP**: Two players on the same machine share keyboard controls.  
 - **Demo Mode**: Auto-play (`--demo` flag).  
 - **Animated Menu**: Dynamic gradient background with mouse and keyboard navigation.  
-- **Sound Effects & Music**: Tile merge sound and looping background music.  
+- **Sound Effects & Music**: Tile merge sound and looping background music.
+- **Platform Compability**: Tested on both Linux and Windows  
 
 ---
 
@@ -35,7 +36,18 @@ sudo apt update
 sudo apt install -y \
     libsdl2-dev libsdl2-ttf-dev libsdl2-mixer-dev \
     clang make
+```
 
+### Windows (MinGW/MSYS2)
+```bash
+pacman -S --needed \
+    mingw-w64-x86_64-toolchain \
+    mingw-w64-x86_64-make \
+    mingw-w64-x86_64-SDL2 \
+    mingw-w64-x86_64-SDL2_ttf \
+    mingw-w64-x86_64-SDL2_mixer \
+    mingw-w64-x86_64-libsharpyuv \
+    zip
 ```
 
 ## Build Instructions
@@ -43,10 +55,11 @@ sudo apt install -y \
 The project uses a simple Makefile. You can customize the compiler and flags via environment variables.
 
 ```bash
-make        # build
-make run    # start PvP mode
-make demo   # start demo (AI) mode
-make clean  # remove build artifacts
+make         # build
+make run     # start PvP mode
+make demo    # start demo (AI) mode
+make clean   # remove build artifacts
+make package # package artifact (Windows only)
 ```
 
 ## Usage
