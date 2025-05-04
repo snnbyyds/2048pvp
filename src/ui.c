@@ -112,8 +112,18 @@ static void ui_render_background() {
 }
 
 menu_choice_t ui_show_menu() {
-    menu_choice_t sel = MENU_START;
+    static SDL_Rect item_rects[MENU_ITEMS];
+    static menu_choice_t sel = MENU_START;
     int y0 = WINDOW_SIZE / 3;
+    for (int i = 0; i < MENU_ITEMS; i++) {
+        int tw, th;
+        TTF_SizeText(gFont, menu_text[i], &tw, &th);
+        item_rects[i] = (SDL_Rect){
+            .x = (WINDOW_SIZE - tw) >> 1,
+            .y = y0 + i * (th + 20),
+            .w = tw, .h = th
+        };
+    }
     while (true) {
         ui_render_background();
         for (int i = 0; i < MENU_ITEMS; i++) {
@@ -141,6 +151,26 @@ menu_choice_t ui_show_menu() {
                     case SDLK_DOWN: sel = (sel + 1) % MENU_ITEMS; break;
                     case SDLK_RETURN: case SDLK_KP_ENTER: return sel;
                     case SDLK_ESCAPE: return MENU_EXIT;
+                }
+            } else if (e.type == SDL_MOUSEMOTION) {
+                int mx = e.motion.x, my = e.motion.y;
+                for (int i = 0; i < MENU_ITEMS; i++) {
+                    if (i != sel && mx >= item_rects[i].x && mx < item_rects[i].x + item_rects[i].w &&
+                        my >= item_rects[i].y && my < item_rects[i].y + item_rects[i].h) {
+                        sel = i;
+                        ui_play_sound();
+                    }
+                }
+            } else if (e.type == SDL_MOUSEBUTTONDOWN) {
+                if (e.button.button == SDL_BUTTON_LEFT) {
+                    int mx = e.button.x, my = e.button.y;
+                    for (int i = 0; i < MENU_ITEMS; i++) {
+                        if (mx >= item_rects[i].x && mx < item_rects[i].x + item_rects[i].w &&
+                            my >= item_rects[i].y && my < item_rects[i].y + item_rects[i].h) {
+                            ui_play_sound();
+                            return i;
+                        }
+                    }
                 }
             }
         }
