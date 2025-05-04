@@ -50,17 +50,17 @@ bool ui_init() {
 }
 
 static inline void ui_render_background() {
-    static SDL_Color grad_start = { 30, 30, 60, 255 };
-    static SDL_Color grad_end = { 80, 10, 40, 255 };
-    for (int y = 0; y < WINDOW_SIZE; y++) {
-        float t = (float)y / (WINDOW_SIZE - 1);
-        uint8_t r = grad_start.r * (1 - t) + grad_end.r * t;
-        uint8_t g = grad_start.g * (1 - t) + grad_end.g * t;
-        uint8_t b = grad_start.b * (1 - t) + grad_end.b * t;
-        uint8_t a = 255;
-        SDL_SetRenderDrawColor(gRenderer, r, g, b, a);
-        SDL_RenderDrawLine(gRenderer, 0, y, WINDOW_SIZE, y);
-    }
+    static SDL_Color grad_start = { 224, 109, 73, 255 };
+    static SDL_Color grad_end = { 33, 243, 205, 255 };
+    uint32_t p = (SDL_GetTicks() / 12) % (WINDOW_SIZE * 2);
+    float t = (float)(p < WINDOW_SIZE ? p : (WINDOW_SIZE * 2) - p) / WINDOW_SIZE;
+    uint8_t r = grad_start.r * (1 - t) + grad_end.r * t;
+    uint8_t g = grad_start.g * (1 - t) + grad_end.g * t;
+    uint8_t b = grad_start.b * (1 - t) + grad_end.b * t;
+    uint8_t a = 255;
+    SDL_SetRenderDrawColor(gRenderer, r, g, b, a);
+    SDL_Rect rect = {0, 0, WINDOW_SIZE, WINDOW_SIZE};
+    SDL_RenderFillRect(gRenderer, &rect);
 }
 
 menu_choice_t ui_show_menu() {
