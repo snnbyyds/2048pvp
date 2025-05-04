@@ -193,6 +193,7 @@ ui_code_t ui_handle_event() {
                 case SDLK_s: case SDLK_DOWN:  return UI_DOWN;
                 case SDLK_a: case SDLK_LEFT:  return UI_LEFT;
                 case SDLK_d: case SDLK_RIGHT: return UI_RIGHT;
+                case SDLK_q:                  return UI_RETURN;
                 case SDLK_ESCAPE:             return UI_QUIT;
             }
         }

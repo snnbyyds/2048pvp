@@ -76,11 +76,15 @@ static void welcome() {
 }
 
 int rungame(bool demo) {
+    static int turn = 0;
+    static menu_choice_t menu_choice;
+    static player_t winner = PLAYER_NONE;
     if (!ui_init()) {
         fprintf(stderr, "UI Init Failed! Quitting...\n");
         return EXIT_FAILURE;
     }
-    menu_choice_t menu_choice = demo ? MENU_DEMO : ui_show_menu();
+label_menu:
+    menu_choice = demo ? MENU_DEMO : ui_show_menu();
     assert(menu_choice != MENU_NONE);
     switch (menu_choice) {
         case MENU_START: break;
@@ -88,10 +92,14 @@ int rungame(bool demo) {
         case MENU_EXIT: ui_cleanup(); return EXIT_SUCCESS;
         case MENU_NONE: __builtin_unreachable(); break;
     }
-    player_t winner = PLAYER_NONE;
+    winner = PLAYER_NONE;
+    init_board();
     ui_render();
     welcome();
-    int turn = 0;
+    for (int i = 0; i < 2; i++) {
+        spawn(1);
+        spawn(-1);
+    }
     display_player(turn);
     while (true) {
         ui_code_t cmd = ui_handle_event();
@@ -99,6 +107,11 @@ int rungame(bool demo) {
             ui_prompt("Exiting...", 512, NULL);
             ui_cleanup();
             return EXIT_SUCCESS;
+        }
+        if (cmd == UI_RETURN) {
+            ui_prompt("Back to main menu.", 512, NULL);
+            demo = false;
+            goto label_menu;
         }
         if (demo) {
             // override cmd in demo mode

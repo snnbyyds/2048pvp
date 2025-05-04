@@ -27,6 +27,5 @@ int main(int argc, char **argv) {
             break;
         }
     }
-    init_board();
     return rungame(demo);
 }

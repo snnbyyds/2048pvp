@@ -140,8 +140,4 @@ bool movable() {
 
 void init_board() {
     memset(board, 0, sizeof(board));
-    for (int i = 0; i < 2; i++) {
-        spawn(1);
-        spawn(-1);
-    }
 }

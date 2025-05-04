@@ -30,7 +30,8 @@ typedef enum {
     UI_DOWN  = 2,
     UI_LEFT  = 3,
     UI_RIGHT = 4,
-    UI_QUIT  = -1
+    UI_RETURN = -1,
+    UI_QUIT  = -2
 } ui_code_t;
 
 typedef enum {
