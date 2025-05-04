@@ -19,6 +19,7 @@
 
 // FIXME: Stop hardcoding font
 static const char *font = "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf";
+static const char *menu_text[MENU_ITEMS] = {"Start Game", "Demo", "Exit"};
 
 static SDL_Window *gWindow = NULL;
 static SDL_Renderer *gRenderer = NULL;
@@ -46,6 +47,58 @@ bool ui_init() {
     if (!gRenderer)
         return false;
     return (gFont = TTF_OpenFont(font, 24));
+}
+
+static inline void ui_render_background() {
+    static SDL_Color grad_start = { 30, 30, 60, 255 };
+    static SDL_Color grad_end = { 80, 10, 40, 255 };
+    for (int y = 0; y < WINDOW_SIZE; y++) {
+        float t = (float)y / (WINDOW_SIZE - 1);
+        uint8_t r = grad_start.r * (1 - t) + grad_end.r * t;
+        uint8_t g = grad_start.g * (1 - t) + grad_end.g * t;
+        uint8_t b = grad_start.b * (1 - t) + grad_end.b * t;
+        uint8_t a = 255;
+        SDL_SetRenderDrawColor(gRenderer, r, g, b, a);
+        SDL_RenderDrawLine(gRenderer, 0, y, WINDOW_SIZE, y);
+    }
+}
+
+menu_choice_t ui_show_menu() {
+    menu_choice_t sel = MENU_START;
+    int y0 = WINDOW_SIZE / 3;
+    while (true) {
+        ui_render_background();
+        for (int i = 0; i < MENU_ITEMS; i++) {
+            SDL_Color color = (i == sel) ?
+                (SDL_Color) {255,255,0,255} :
+                (SDL_Color) {200,200,200,255};
+            SDL_Surface *surf = TTF_RenderText_Solid(gFont, menu_text[i], color);
+            SDL_Texture *tx = SDL_CreateTextureFromSurface(gRenderer, surf);
+            int w, h;
+            SDL_QueryTexture(tx, NULL, NULL, &w, &h);
+            SDL_Rect dst = {(WINDOW_SIZE - w) >> 1, y0 + (i << 6), w, h};
+            SDL_RenderCopy(gRenderer, tx, NULL, &dst);
+            SDL_DestroyTexture(tx);
+            SDL_FreeSurface(surf);
+        }
+        SDL_RenderPresent(gRenderer);
+        SDL_Event e;
+        while (SDL_PollEvent(&e)) {
+            if (e.type == SDL_QUIT)
+                return MENU_EXIT;
+            if (e.type == SDL_KEYDOWN) {
+                switch (e.key.keysym.sym) {
+                    case SDLK_UP: sel = (sel + MENU_ITEMS - 1) % MENU_ITEMS; break;
+                    case SDLK_DOWN: sel = (sel + 1) % MENU_ITEMS; break;
+                    case SDLK_RETURN: case SDLK_KP_ENTER: return sel;
+                    case SDLK_ESCAPE: return MENU_EXIT;
+                }
+            }
+        }
+        SDL_Delay(64);
+    }
+    __builtin_unreachable();
+    return MENU_NONE;
 }
 
 void ui_render() {

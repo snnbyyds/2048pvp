@@ -80,6 +80,14 @@ int rungame(bool demo) {
         fprintf(stderr, "UI Init Failed! Quitting...\n");
         return EXIT_FAILURE;
     }
+    menu_choice_t menu_choice = ui_show_menu();
+    assert(menu_choice != MENU_NONE);
+    switch (menu_choice) {
+        case MENU_START: break;
+        case MENU_DEMO: demo = true; break;
+        case MENU_EXIT: ui_cleanup(); return EXIT_SUCCESS;
+        case MENU_NONE: __builtin_unreachable(); break;
+    }
     player_t winner = PLAYER_NONE;
     ui_render();
     welcome();

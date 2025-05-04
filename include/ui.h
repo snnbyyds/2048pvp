@@ -33,7 +33,17 @@ typedef enum {
     UI_QUIT  = -1
 } ui_code_t;
 
+typedef enum {
+    MENU_START,
+    MENU_DEMO,
+    MENU_EXIT,
+    MENU_NONE
+} menu_choice_t;
+
+#define MENU_ITEMS MENU_NONE
+
 bool ui_init();
+menu_choice_t ui_show_menu();
 void ui_render();
 ui_code_t ui_handle_event();
 void ui_delay(uint32_t ms);
