@@ -17,8 +17,7 @@
 #include <ui.h>
 #include <board.h>
 
-// FIXME: Stop hardcoding font
-static const char *font = "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf";
+static const char *font = "assets/Morning Routine.otf";
 static const char *menu_text[MENU_ITEMS] = {"Start Game", "Demo", "Exit"};
 
 static SDL_Window *gWindow = NULL;
@@ -46,7 +45,7 @@ bool ui_init() {
     gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
     if (!gRenderer)
         return false;
-    return (gFont = TTF_OpenFont(font, 24));
+    return (gFont = TTF_OpenFont(font, 48));
 }
 
 static inline void ui_render_background() {
@@ -76,7 +75,7 @@ menu_choice_t ui_show_menu() {
             SDL_Texture *tx = SDL_CreateTextureFromSurface(gRenderer, surf);
             int w, h;
             SDL_QueryTexture(tx, NULL, NULL, &w, &h);
-            SDL_Rect dst = {(WINDOW_SIZE - w) >> 1, y0 + (i << 6), w, h};
+            SDL_Rect dst = {(WINDOW_SIZE - w) >> 1, y0 + i * 96, w, h};
             SDL_RenderCopy(gRenderer, tx, NULL, &dst);
             SDL_DestroyTexture(tx);
             SDL_FreeSurface(surf);
