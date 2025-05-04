@@ -23,6 +23,7 @@ static const char *menu_text[MENU_ITEMS] = {"Start Game", "Demo", "Exit"};
 static SDL_Window *gWindow = NULL;
 static SDL_Renderer *gRenderer = NULL;
 static Mix_Music *gMusic = NULL;
+static Mix_Chunk *gSoundEffect = NULL;
 static TTF_Font *gFont = NULL;
 static SDL_Color gFontColor = {0, 0, 0, 255};
 
@@ -31,9 +32,12 @@ bool ui_init() {
         return false;
     if (TTF_Init() || Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048))
         return false;
-    gMusic = Mix_LoadMUS("assets/beast.mp3");
-    if (!gMusic)
+    gMusic = Mix_LoadMUS("assets/background.mp3");
+    gSoundEffect = Mix_LoadWAV("assets/move.wav");
+    if (!gMusic || !gSoundEffect)
         return false;
+    Mix_VolumeMusic(MIX_MAX_VOLUME / 4);
+    Mix_VolumeChunk(gSoundEffect, MIX_MAX_VOLUME);
     gWindow = SDL_CreateWindow(
         "2048 PvP", 
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -45,6 +49,7 @@ bool ui_init() {
     gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
     if (!gRenderer)
         return false;
+    Mix_PlayMusic(gMusic, -1);
     return (gFont = TTF_OpenFont(font, 48));
 }
 
@@ -130,6 +135,7 @@ menu_choice_t ui_show_menu() {
             if (e.type == SDL_QUIT)
                 return MENU_EXIT;
             if (e.type == SDL_KEYDOWN) {
+                ui_play_sound();
                 switch (e.key.keysym.sym) {
                     case SDLK_UP: sel = (sel + MENU_ITEMS - 1) % MENU_ITEMS; break;
                     case SDLK_DOWN: sel = (sel + 1) % MENU_ITEMS; break;
@@ -157,7 +163,7 @@ void ui_render() {
 }
 
 void ui_play_sound() {
-    Mix_PlayMusic(gMusic, 1);
+    Mix_PlayChannel(-1, gSoundEffect, 0);
 }
 
 void ui_prompt(const char *s, uint32_t delay_ms, const SDL_Color *fontcolor) {
@@ -201,6 +207,8 @@ void ui_delay(uint32_t ms) {
 void ui_cleanup() {
     if (gMusic)
         Mix_FreeMusic(gMusic);
+    if (gSoundEffect)
+        Mix_FreeChunk(gSoundEffect);
     if (gFont)
         TTF_CloseFont(gFont);
     if (gRenderer)
