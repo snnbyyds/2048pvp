@@ -141,14 +141,22 @@ label_menu:
             break;
         if (!movable())
             winner = check_with_largest_block();
-        if (winner)
+        if (winner != PLAYER_NONE)
             break;
         turn ^= 1;
         display_player(turn);
     }
     display_result(winner);
-    while (ui_handle_event() != UI_QUIT)
+    while (true) {
+        ui_code_t cmd = ui_handle_event();
+        if (cmd == UI_QUIT)
+            break;
+        if (cmd == UI_RETURN) {
+            demo = false;
+            goto label_menu;
+        }
         ui_delay(8);
+    }
     ui_cleanup();
     return EXIT_SUCCESS;
 }
