@@ -80,7 +80,7 @@ int rungame(bool demo) {
         fprintf(stderr, "UI Init Failed! Quitting...\n");
         return EXIT_FAILURE;
     }
-    menu_choice_t menu_choice = ui_show_menu();
+    menu_choice_t menu_choice = demo ? MENU_DEMO : ui_show_menu();
     assert(menu_choice != MENU_NONE);
     switch (menu_choice) {
         case MENU_START: break;
