@@ -134,7 +134,8 @@ int rungame(bool demo) {
         display_player(turn);
     }
     display_result(winner);
-    while (ui_handle_event() != UI_QUIT);
+    while (ui_handle_event() != UI_QUIT)
+        ui_delay(8);
     ui_cleanup();
     return EXIT_SUCCESS;
 }
