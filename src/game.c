@@ -75,7 +75,7 @@ static void welcome() {
     ui_prompt("Welcome to 2048pvp", 2048, &color);
 }
 
-int rungame() {
+int rungame(bool demo) {
     if (!ui_init()) {
         fprintf(stderr, "UI Init Failed! Quitting...\n");
         return EXIT_FAILURE;
@@ -91,6 +91,16 @@ int rungame() {
             ui_prompt("Exiting...", 512, NULL);
             ui_cleanup();
             return EXIT_SUCCESS;
+        }
+        if (demo) {
+            // override cmd in demo mode
+            int choice = rand() % 4;
+            switch (choice) {
+                case 0: cmd = UI_UP; break;
+                case 1: cmd = UI_DOWN; break;
+                case 2: cmd = UI_LEFT; break;
+                case 3: cmd = UI_RIGHT; break;
+            }
         }
         bool moved = false;
         switch (cmd) {

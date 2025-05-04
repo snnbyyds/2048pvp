@@ -25,7 +25,10 @@ $(OBJ_DIR):
 run: all
 	./$(TARGET)
 
+demo: all
+	./$(TARGET) --demo
+
 clean:
 	rm -rf $(OBJ_DIR) $(TARGET)
 
-.PHONY: all clean run
+.PHONY: all clean run demo

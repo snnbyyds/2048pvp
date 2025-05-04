@@ -18,7 +18,15 @@
 #include <game.h>
 #include <board.h>
 
-int main() {
+int main(int argc, char **argv) {
+    bool demo = false;
+    for (int i = 0; i < argc; i++) {
+        if (!strcmp("--demo", argv[i])) {
+            demo = true;
+            printf("Demo Mode is ON!\n");
+            break;
+        }
+    }
     init_board();
-    return rungame();
+    return rungame(demo);
 }
