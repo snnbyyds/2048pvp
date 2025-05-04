@@ -48,18 +48,62 @@ bool ui_init() {
     return (gFont = TTF_OpenFont(font, 48));
 }
 
-static inline void ui_render_background() {
-    static SDL_Color grad_start = { 224, 109, 73, 255 };
-    static SDL_Color grad_end = { 33, 243, 205, 255 };
-    uint32_t p = (SDL_GetTicks() / 12) % (WINDOW_SIZE * 2);
-    float t = (float)(p < WINDOW_SIZE ? p : (WINDOW_SIZE * 2) - p) / WINDOW_SIZE;
-    uint8_t r = grad_start.r * (1 - t) + grad_end.r * t;
-    uint8_t g = grad_start.g * (1 - t) + grad_end.g * t;
-    uint8_t b = grad_start.b * (1 - t) + grad_end.b * t;
-    uint8_t a = 255;
-    SDL_SetRenderDrawColor(gRenderer, r, g, b, a);
-    SDL_Rect rect = {0, 0, WINDOW_SIZE, WINDOW_SIZE};
-    SDL_RenderFillRect(gRenderer, &rect);
+static void ui_draw_block(int v, int i, int j) {
+    int cell = WINDOW_SIZE / N;
+    SDL_Rect r = { .x = j * cell + 1, .y = i * cell + 1, .w = cell - 2, .h = cell - 2 };
+    if (v > 0)
+        SDL_SetRenderDrawColor(gRenderer, 200, 230, 200, 255);
+    else if (v < 0)
+        SDL_SetRenderDrawColor(gRenderer, 230, 200, 200, 255);
+    else
+        SDL_SetRenderDrawColor(gRenderer, 200, 200, 200, 255);
+    SDL_RenderFillRect(gRenderer, &r);
+    if (v) {
+        char buf[18];
+        snprintf(buf, 16, "%d", abs(v));
+        SDL_Surface *surf = TTF_RenderText_Solid(gFont, buf, gFontColor);
+        SDL_Texture *tx = SDL_CreateTextureFromSurface(gRenderer, surf);
+        int w, h;
+        SDL_QueryTexture(tx, NULL, NULL, &w, &h);
+        SDL_Rect tr = {
+            .x = j * cell + ((cell - w) >> 1),
+            .y = i * cell + ((cell - h) >> 1),
+            .w = w, .h = h
+        };
+        SDL_RenderCopy(gRenderer, tx, NULL, &tr);
+        SDL_DestroyTexture(tx);
+        SDL_FreeSurface(surf);
+    }
+}
+
+static void ui_render_background() {
+    {    
+        static SDL_Color grad_start = { 224, 109, 73, 255 };
+        static SDL_Color grad_end = { 33, 243, 205, 255 };
+        uint32_t p = (SDL_GetTicks() / 12) % (WINDOW_SIZE * 2);
+        float t = (float)(p < WINDOW_SIZE ? p : (WINDOW_SIZE * 2) - p) / WINDOW_SIZE;
+        uint8_t r = grad_start.r * (1 - t) + grad_end.r * t;
+        uint8_t g = grad_start.g * (1 - t) + grad_end.g * t;
+        uint8_t b = grad_start.b * (1 - t) + grad_end.b * t;
+        uint8_t a = 255;
+        SDL_SetRenderDrawColor(gRenderer, r, g, b, a);
+        SDL_Rect rect = {0, 0, WINDOW_SIZE, WINDOW_SIZE};
+        SDL_RenderFillRect(gRenderer, &rect);
+    }
+    {
+        static int i = 0, j = 0, v = 2, s = 1;
+        static uint32_t start = 0;
+        if (SDL_GetTicks() - start > 512) {
+            i = rand() % N;
+            j = rand() % N;
+            v = 1 << (rand() % 12);
+            if (v < 2)
+                v <<= 1;
+            s = rand() & 1 ? -1 : 1;
+            start = SDL_GetTicks();
+        }
+        ui_draw_block(v * s, i, j);
+    }
 }
 
 menu_choice_t ui_show_menu() {
@@ -101,36 +145,12 @@ menu_choice_t ui_show_menu() {
 }
 
 void ui_render() {
-    SDL_SetRenderDrawColor(gRenderer, 240, 240, 240, 255); // rgba
+    SDL_SetRenderDrawColor(gRenderer, 240, 240, 240, 255);
     SDL_RenderClear(gRenderer);
-    int cell = WINDOW_SIZE / N;
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             int v = board[i][j];
-            SDL_Rect r = { .x = j * cell + 1, .y = i * cell + 1, .w = cell - 2, .h = cell - 2 };
-            if (v > 0)
-                SDL_SetRenderDrawColor(gRenderer, 200, 230, 200, 255);
-            else if (v < 0)
-                SDL_SetRenderDrawColor(gRenderer, 230, 200, 200, 255);
-            else
-                SDL_SetRenderDrawColor(gRenderer, 200, 200, 200, 255);
-            SDL_RenderFillRect(gRenderer, &r);
-            if (v) {
-                char buf[18];
-                snprintf(buf, 16, "%d", abs(v));
-                SDL_Surface *surf = TTF_RenderText_Solid(gFont, buf, gFontColor);
-                SDL_Texture *tx = SDL_CreateTextureFromSurface(gRenderer, surf);
-                int w, h;
-                SDL_QueryTexture(tx, NULL, NULL, &w, &h);
-                SDL_Rect tr = {
-                    .x = j * cell + ((cell - w) >> 1),
-                    .y = i * cell + ((cell - h) >> 1),
-                    .w = w, .h = h
-                };
-                SDL_RenderCopy(gRenderer, tx, NULL, &tr);
-                SDL_DestroyTexture(tx);
-                SDL_FreeSurface(surf);
-            }
+            ui_draw_block(v, i, j);
         }
     }
     SDL_RenderPresent(gRenderer);
