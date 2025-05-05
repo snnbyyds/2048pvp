@@ -56,7 +56,7 @@ bool ui_init() {
     SDL_Surface *surf = IMG_Load(cursor);
     if (!surf)
         return false;
-    gCursor = SDL_CreateColorCursor(surf, 16, 16);
+    gCursor = SDL_CreateColorCursor(surf, 2, 2);
     SDL_FreeSurface(surf);
     SDL_SetCursor(gCursor);
     Mix_PlayMusic(gMusic, -1);
@@ -130,7 +130,7 @@ menu_choice_t ui_show_menu() {
         TTF_SizeText(gFont, menu_text[i], &tw, &th);
         item_rects[i] = (SDL_Rect){
             .x = (WINDOW_SIZE - tw) >> 1,
-            .y = y0 + i * (th + 20),
+            .y = y0 + i * (th + 48),
             .w = tw, .h = th
         };
     }
@@ -144,8 +144,7 @@ menu_choice_t ui_show_menu() {
             SDL_Texture *tx = SDL_CreateTextureFromSurface(gRenderer, surf);
             int w, h;
             SDL_QueryTexture(tx, NULL, NULL, &w, &h);
-            SDL_Rect dst = {(WINDOW_SIZE - w) >> 1, y0 + i * 96, w, h};
-            SDL_RenderCopy(gRenderer, tx, NULL, &dst);
+            SDL_RenderCopy(gRenderer, tx, NULL, item_rects + i);
             SDL_DestroyTexture(tx);
             SDL_FreeSurface(surf);
         }
