@@ -23,7 +23,7 @@
 #include <SDL2/SDL_ttf.h>
 #include "common.h"
 
-#define WINDOW_SIZE 640
+#define WINDOW_SIZE 720
 
 typedef enum {
     UI_NONE  = 0,
