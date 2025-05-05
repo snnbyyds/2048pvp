@@ -56,18 +56,20 @@ static player_t check_with_largest_block() {
 
 static void display_result(player_t winner) {
     assert(winner != PLAYER_NONE);
-    const SDL_Color color = {13, 116, 216, 255};
+    static const SDL_Color color = {13, 116, 216, 255};
     if (winner == PLAYER_A)
         ui_prompt("PLAYER A WINS!!", 4096, &color);
     else
         ui_prompt("PLAYER B WINS!!", 4096, &color);
 }
 
-static void display_player(int turn) {
-    if (turn == 0)
-        ui_prompt("PLAYER A's turn", 512, NULL);
+static void display_player(player_t player) {
+    static const SDL_Color color_a = {10, 134, 9, 255};
+    static const SDL_Color color_b = {229, 40, 114, 255};
+    if (player == PLAYER_A)
+        ui_prompt("PLAYER A's turn", 512, &color_a);
     else
-        ui_prompt("PLAYER B's turn", 512, NULL);
+        ui_prompt("PLAYER B's turn", 512, &color_b);
 }
 
 static void welcome() {
@@ -76,9 +78,10 @@ static void welcome() {
 }
 
 int rungame(bool demo) {
-    static int turn = 0;
     static menu_choice_t menu_choice;
-    static player_t winner = PLAYER_NONE;
+    player_t winner = PLAYER_NONE;
+    player_t cur_player = PLAYER_A;
+    bool pvc = false;
     if (!ui_init()) {
         fprintf(stderr, "UI Init Failed! Quitting...\n");
         return EXIT_FAILURE;
@@ -87,12 +90,14 @@ label_menu:
     menu_choice = demo ? MENU_DEMO : ui_show_menu();
     assert(menu_choice != MENU_NONE);
     switch (menu_choice) {
-        case MENU_START: break;
-        case MENU_DEMO: demo = true; break;
+        case MENU_PVP: pvc = demo = false; break;
+        case MENU_PVC: pvc = true; demo = false; break;
+        case MENU_DEMO: demo = true; pvc = false; break;
         case MENU_EXIT: ui_cleanup(); return EXIT_SUCCESS;
         case MENU_NONE: __builtin_unreachable(); break;
     }
     winner = PLAYER_NONE;
+    cur_player = PLAYER_A;
     init_board();
     ui_render();
     welcome();
@@ -100,7 +105,7 @@ label_menu:
         spawn(1);
         spawn(-1);
     }
-    display_player(turn);
+    display_player(cur_player);
     while (true) {
         ui_code_t cmd = ui_handle_event();
         if (cmd == UI_QUIT) {
@@ -113,9 +118,12 @@ label_menu:
             demo = false;
             goto label_menu;
         }
-        if (demo) {
-            // override cmd in demo mode
-            int choice = rand() % 4;
+        if (demo || (pvc && cur_player == PLAYER_B)) {
+            // override cmd for AI
+            int rv = rand();
+            if (pvc)
+                ui_prompt("Bot is thinking...", ((double)(rv % 100) / 100.0 + 0.2) * 1024, NULL);
+            int choice = rv % 4;
             switch (choice) {
                 case 0: cmd = UI_UP; break;
                 case 1: cmd = UI_DOWN; break;
@@ -134,7 +142,7 @@ label_menu:
         if (!moved)
             continue;
         ui_play_sound();
-        spawn(turn == 0 ? PLAYER_A : PLAYER_B);
+        spawn(cur_player == PLAYER_B ? PLAYER_A : PLAYER_B);
         ui_render();
         winner = check_2048();
         if (winner != PLAYER_NONE)
@@ -143,18 +151,16 @@ label_menu:
             winner = check_with_largest_block();
         if (winner != PLAYER_NONE)
             break;
-        turn ^= 1;
-        display_player(turn);
+        cur_player = cur_player == PLAYER_B ? PLAYER_A : PLAYER_B;
+        display_player(cur_player);
     }
     display_result(winner);
     while (true) {
         ui_code_t cmd = ui_handle_event();
         if (cmd == UI_QUIT)
             break;
-        if (cmd == UI_RETURN) {
-            demo = false;
+        if (cmd == UI_RETURN)
             goto label_menu;
-        }
         ui_delay(8);
     }
     ui_cleanup();

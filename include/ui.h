@@ -36,7 +36,8 @@ typedef enum {
 } ui_code_t;
 
 typedef enum {
-    MENU_START,
+    MENU_PVP,
+    MENU_PVC,
     MENU_DEMO,
     MENU_EXIT,
     MENU_NONE

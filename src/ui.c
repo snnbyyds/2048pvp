@@ -21,7 +21,7 @@ static const char *background_music = "assets/background.mp3";
 static const char *sound_effect = "assets/move.wav";
 static const char *cursor = "assets/cursor.png";
 static const char *font = "assets/Morning Routine.otf";
-static const char *menu_text[MENU_ITEMS] = {"Start Game", "Demo", "Exit"};
+static const char *menu_text[MENU_ITEMS] = {"Start Game (PvP)", "Start Game (PvC)", "Demo", "Exit"};
 
 static SDL_Window *gWindow = NULL;
 static SDL_Renderer *gRenderer = NULL;
@@ -29,7 +29,7 @@ static SDL_Cursor *gCursor = NULL;
 static Mix_Music *gMusic = NULL;
 static Mix_Chunk *gSoundEffect = NULL;
 static TTF_Font *gFont = NULL;
-static SDL_Color gFontColor = {0, 0, 0, 255};
+static SDL_Color gFontColor = {32, 32, 32, 255};
 
 bool ui_init() {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO))
@@ -67,9 +67,9 @@ static void ui_draw_block(int v, int i, int j) {
     int cell = WINDOW_SIZE / N;
     SDL_Rect r = { .x = j * cell + 1, .y = i * cell + 1, .w = cell - 2, .h = cell - 2 };
     if (v > 0)
-        SDL_SetRenderDrawColor(gRenderer, 200, 230, 200, 255);
+        SDL_SetRenderDrawColor(gRenderer, 200, 230, 200, 255); // A
     else if (v < 0)
-        SDL_SetRenderDrawColor(gRenderer, 230, 200, 200, 255);
+        SDL_SetRenderDrawColor(gRenderer, 230, 200, 200, 255); // B
     else
         SDL_SetRenderDrawColor(gRenderer, 200, 200, 200, 255);
     SDL_RenderFillRect(gRenderer, &r);
@@ -123,8 +123,8 @@ static void ui_render_background() {
 
 menu_choice_t ui_show_menu() {
     static SDL_Rect item_rects[MENU_ITEMS];
-    static menu_choice_t sel = MENU_START;
-    int y0 = WINDOW_SIZE / 3;
+    static menu_choice_t sel = MENU_PVP;
+    int y0 = WINDOW_SIZE >> 2;
     for (int i = 0; i < MENU_ITEMS; i++) {
         int tw, th;
         TTF_SizeText(gFont, menu_text[i], &tw, &th);
