@@ -159,8 +159,10 @@ label_menu:
         ui_code_t cmd = ui_handle_event();
         if (cmd == UI_QUIT)
             break;
-        if (cmd == UI_RETURN)
+        if (cmd == UI_RETURN) {
+            demo = false;
             goto label_menu;
+        }
         ui_delay(8);
     }
     ui_cleanup();
