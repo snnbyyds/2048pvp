@@ -67,3 +67,11 @@ else
 endif
 
 .PHONY: all clean run demo package
+
+HDRS := $(wildcard $(INCLUDE_DIR)/*.h)
+
+.PHONY: format
+format:
+	@echo "Running clang-format..."
+	clang-format -i $(SRCS) $(HDRS)
+	@echo "Done."

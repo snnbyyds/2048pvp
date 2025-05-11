@@ -1,18 +1,18 @@
 /*
-  * Copyright 2025 Nuo Shen, Nanjing University
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License");
-  * you may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at
-  *
-  *     http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  */
+ * Copyright 2025 Nuo Shen, Nanjing University
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #include <board.h>
 #include <game.h>
@@ -91,8 +91,14 @@ label_menu:
     assert(menu_choice != MENU_NONE);
     switch (menu_choice) {
         case MENU_PVP: pvc = demo = false; break;
-        case MENU_PVC: pvc = true; demo = false; break;
-        case MENU_DEMO: demo = true; pvc = false; break;
+        case MENU_PVC:
+            pvc = true;
+            demo = false;
+            break;
+        case MENU_DEMO:
+            demo = true;
+            pvc = false;
+            break;
         case MENU_EXIT: ui_cleanup(); return EXIT_SUCCESS;
         case MENU_NONE: __builtin_unreachable(); break;
     }
@@ -122,7 +128,8 @@ label_menu:
             // override cmd for AI
             int rv = rand();
             if (pvc)
-                ui_prompt("Bot is thinking...", ((double)(rv % 100) / 100.0 + 0.2) * 1024, NULL);
+                ui_prompt("Bot is thinking...",
+                          ((double)(rv % 100) / 100.0 + 0.2) * 1024, NULL);
             int choice = rv % 4;
             switch (choice) {
                 case 0: cmd = UI_UP; break;
