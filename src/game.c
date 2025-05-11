@@ -46,7 +46,7 @@ static player_t check_with_largest_block() {
             if (!v)
                 continue;
             if (abs(v) > mx) {
-                mx = v;
+                mx = abs(v);
                 ret = check_owner(v);
             }
         }
