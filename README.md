@@ -35,7 +35,7 @@ sudo pacman -Syu sdl2 sdl2_ttf sdl2_mixer sdl2_image clang make
 # Install dependencies via apt
 sudo apt update
 sudo apt install -y \
-    libsdl2-dev libsdl2-ttf-dev libsdl2-mixer-dev \
+    libsdl2-dev libsdl2-ttf-dev libsdl2-mixer-dev libsdl2-image-dev \
     clang make
 ```
 
